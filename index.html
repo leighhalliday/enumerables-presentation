@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+		<title>Mastering the Ruby Enumerable Module</title>
+
+		<meta name="description" content="A framework for easily creating beautiful presentations using HTML">
+		<meta name="author" content="Leigh Halliday">
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/black.css" id="theme">
+
+		<!-- Code syntax highlighting -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+
+		<!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+	</head>
+
+	<body>
+
+		<div class="reveal">
+
+			<!-- Any section element inside of this container is displayed as a slide -->
+			<div class="slides">
+				<section>
+					<h1>Enumerable</h1>
+					<h3>Mastering the Ruby Enumerable Module</h3>
+					<p>
+						<small>Created by <a href="http://www.leighhalliday.com">Leigh Halliday</a> / <a href="http://twitter.com/leighchalliday">@leighchalliday</a></small>
+					</p>
+				</section>
+
+				<section>
+					<section>
+						<h2>Serious Stuff</h2>
+						<ul>
+							<li>Work @ theScore</li>
+							<li>Teach @ Lighthouse Labs</li>
+							<li>Write @ Codeship</li>
+							<li>Blog @ leighhalliday.com</li>
+						</ul>
+					</section>
+					<section>
+						<h2>Fun Stuff</h2>
+						<ul>
+							<li>Certified coffee grower</li>
+							<li>Really like llamas</li>
+							<li>Want a pizza oven</li>
+							<li>Bake my own bread</li>
+							<li>Hablo español</li>
+						</ul>
+					</section>
+				</section>
+
+				<section class="fragments">
+					<h2>The Plan</h2>
+					<ul>
+						<li class="fragment">What is the Enumerable module?</li>
+						<li class="fragment">Where is Enumerable used?</li>
+						<li class="fragment">Using the Enumerable module</li>
+						<li class="fragment">Creating our own enumerables</li>
+						<li class="fragment">Practice</li>
+					</ul>
+				</section>
+
+				<section>
+					<section>
+						<h2>What?</h2>
+						<h4>What is the Enumerable module?</h4>
+					</section>
+					<section data-markdown>
+						A Module or "Mixin" is a way to group and share functionality across classes.
+
+						It is a collection of methods and constants.
+
+						```ruby
+						module Door
+							def open_door
+								puts "Opening door."
+							end
+						end
+						```
+					</section>
+					<section data-markdown>
+						We can use `include` to bring functionality from the Door module into another class
+						like a House or Car.
+
+						```ruby
+						class House
+							include Door
+						end
+
+						downtown = House.new
+						downtown.open_door # "Opening door."
+						```
+					</section>
+					<section data-markdown>
+						## Where is it used?
+
+						The Enumerable module brings functionality commonly associated with collections of things.
+
+						It is included in the following classes:
+						- Array
+						- Hash
+					</section>
+				</section>
+
+				<section>
+					<section class="fragments">
+						<h2>What can Enumerable do?</h2>
+						<ul>
+							<li class="fragment">How many?</li>
+							<li class="fragment">Is this true?</li>
+							<li class="fragment">I only want ____ ones</li>
+							<li class="fragment">Create a new modified collection</li>
+							<li class="fragment">Find me a specific one</li>
+						</ul>
+					</section>
+					<section data-markdown>
+						## Our Data
+
+						```ruby
+						class Tea
+							attr_accessor :name, :cost, :caffiene, :steep
+							def is_caffienated?
+								caffiene > 0
+							end
+						end
+						```
+					</section>
+					<section class="fragments">
+						<h2>Enumerable Methods</h2>
+						<ul>
+							<li class="fragment">count</li>
+							<li class="fragment">any?</li>
+							<li class="fragment">all?</li>
+							<li class="fragment">select</li>
+							<li class="fragment">find</li>
+							<li class="fragment">min</li>
+							<li class="fragment">map</li>
+						</ul>
+					</section>
+				</section>
+
+				<section>
+					<section data-markdown>
+						## Include Enumerable in our class
+
+						If you have a class which is a "Collection", you can give it
+						all of the Enumerable functionality. Done in 3 steps.
+					</section>
+					<section data-markdown>
+						1) First we need to include the module in our class.
+
+						```ruby
+						class TeaCollection
+							include Enumerable
+						end
+						```
+					</section>
+					<section data-markdown>
+						2) We need to implement an `each` method which will `yield` each item
+						(in our case a Tea)
+
+						```ruby
+						class TeaCollection
+							include Enumerable
+
+							def each
+								@teas.each { |tea| yield tea }
+							end
+						end
+						```
+					</section>
+					<section data-markdown>
+						3) (optional) If we want to be able to use `min`, `max`, `sort`, our objects
+						which are yielded must implement the `<=>` (spaceship) method.
+						It returns -1, 0, or 1 depending if the receiver is less than, equal to,
+						or greater than what it is being compared to.
+
+						Let's assume our Tea object is being compared on price.
+
+						```ruby
+						class Tea
+							def <=>(other)
+								self.price <=> other.price
+							end
+						end
+						```
+					</section>
+					<section data-markdown>
+						```ruby
+						teas = TeaCollection.new(Tea.new, Tea.new, Tea.new)
+						teas.count # 3
+						```
+					</section>
+				</section>
+
+				<section data-markdown>
+					## Practice
+
+					- Exercise: https://github.com/leighhalliday/llama-enumerables
+					- Read about it: http://ruby-doc.org/core-2.2.3/Enumerable.html
+					- Blog post: coming soon!
+				</section>
+
+				<section data-markdown>
+					## Thank You!!
+				</section>
+
+			</div>
+
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+
+			// Full list of configuration options available at:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+
+				transition: 'slide', // none/fade/slide/convex/concave/zoom
+
+				// Optional reveal.js plugins
+				dependencies: [
+					{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/highlight/highlight.js', callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'plugin/zoom-js/zoom.js', async: true },
+					{ src: 'plugin/notes/notes.js', async: true }
+				]
+			});
+
+		</script>
+
+	</body>
+</html>
